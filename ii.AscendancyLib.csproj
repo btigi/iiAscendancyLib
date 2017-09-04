@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <RootNamespace>ii.AscendancyLib</RootNamespace>
+    <AssemblyName>ii.AscendancyLib</AssemblyName>
+  </PropertyGroup>
+
+</Project>
