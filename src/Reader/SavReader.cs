@@ -1,5 +1,5 @@
-﻿using ii.AscendancyLib.Model;
-using ii.AscendancyLib.Model.Enum;
+﻿using ii.AscendancyLib.Model.Sav;
+using ii.AscendancyLib.Model.Sav.Enum;
 using System.IO;
 
 namespace ii.AscendancyLib.Reader

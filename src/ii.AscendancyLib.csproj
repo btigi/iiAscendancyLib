@@ -4,7 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>ii.AscendancyLib</RootNamespace>
     <AssemblyName>ii.AscendancyLib</AssemblyName>
-    <langversion>latest</langversion>
+    <langversion>13.0</langversion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
+  </ItemGroup>
 
 </Project>
