@@ -5,6 +5,14 @@
     <RootNamespace>ii.AscendancyLib</RootNamespace>
     <AssemblyName>ii.AscendancyLib</AssemblyName>
     <langversion>13.0</langversion>
+    <Copyright>Copyright ©  2025</Copyright>
+    <Title>ii.AscendancyLib</Title>
+    <Version>0.7.0.0-alpha.1</Version>
+    <Authors>iggti</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/btigi/iiAscendancyLib</RepositoryUrl>
+    <Description>A library to facilitate editing of the 1995 Logic Factory game Ascendancy.</Description>
+    <PackageTags>infinity-engine;bgee;bgee2</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

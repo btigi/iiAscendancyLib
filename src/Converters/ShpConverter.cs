@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace ii.AscendancyLib.Converters
@@ -202,6 +203,107 @@ namespace ii.AscendancyLib.Converters
             {
                 Console.WriteLine(msg);
             }
+        }
+
+        public void FromBitmap(List<string> filenames, string output)
+        {
+            var imageInfos = new List<ImageInfo>();
+
+            long offset = 0;
+            var imagesAdded = 0;
+            var imageContentBytes = new List<byte>();
+            foreach (var file in filenames)
+            {
+                imagesAdded++;
+                offset = 8 + (imagesAdded * 8) + imageContentBytes.Count;
+
+                var bitmap = new Bitmap(file);
+
+                var imageHeader = new ImageHeader();
+                imageHeader.Height = (short)bitmap.Height;
+                imageHeader.YCentre = 0;
+                imageHeader.XCentre = 0;
+                imageHeader.xStart = 0;
+                imageHeader.yStart = 0;
+                imageHeader.xEnd = (short)bitmap.Width;
+                imageHeader.yEnd = (short)bitmap.Height;
+                imageHeader.Width = (short)bitmap.Width;
+
+                imageContentBytes.AddRange(Common.WriteStruct(imageHeader));
+
+                var bData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+                var size = bData.Stride * bData.Height;
+                var data = new byte[size];
+                Marshal.Copy(bData.Scan0, data, 0, size);
+
+                var brightnessMultiplier = 4;
+                for (int i = 0; i < size / 4; i += 4)
+                {
+                    var r = data[i + 0] / brightnessMultiplier;
+                    var g = data[i + 1] / brightnessMultiplier;
+                    var b = data[i + 2] / brightnessMultiplier;
+                    var a = data[i + 3] / brightnessMultiplier;
+                    var colour = $"{b:X2}{g:X2}{r:X2}";
+
+                    var paleteIndex = DefaultPalette.defaultPalette.IndexOf(colour);
+                    //if (colour == "30200C" && false)
+                    //{
+                    //    imageContentBytes.Add(62);
+                    //    imageContentBytes.Add(242);
+                    //}
+                    //if (colour == "24A410" && false)
+                    //{
+                    //    imageContentBytes.Add(62);
+                    //    imageContentBytes.Add(100);
+                    //}
+                    //if (colour == "24A410" || true)
+                    //{
+                    //    imageContentBytes.Add(62);
+                    //    imageContentBytes.Add(50);
+                    //}
+
+                    imageContentBytes.Add(1);
+                    imageContentBytes.Add((byte)paleteIndex);
+
+                    // 0 -> fill the rest of the row with the default colour
+                    // 1,x -> fill x bytes with default colour
+                    // ((infoByte & Common.Bit0) == 0) -> var length = infoByte >> 1; then 'read a byte to represet the colour, draw length bytes that colour'
+                    //if (i == 5)
+                    //{
+                    //    imageContentBytes.Add(62);
+                    //    imageContentBytes.Add(10);
+                    //}
+                    // ((infoByte & Common.Bit0) != 0) -> var length = infoByte >> 1; then 'read a byte to represet the colour, draw a byte', length times
+
+                    //imageContentBytes.Add(0);
+                }
+
+                Marshal.Copy(data, 0, bData.Scan0, data.Length);
+                bitmap.UnlockBits(bData);
+
+                var imageInfo = new ImageInfo();
+                imageInfo.ImageOffset = (Int32)offset;
+                imageInfo.PaletteOffset = 0;
+                imageInfos.Add(imageInfo);
+            }
+
+            var introBytes = new List<byte>();
+
+            var header = new ShpHeader();
+            header.Version = "1.10".ToCharArray();
+            header.ImageCount = filenames.Count;
+
+            introBytes.AddRange(Common.WriteStruct(header));
+
+            foreach (var i in imageInfos)
+            {
+                introBytes.AddRange(Common.WriteStruct(i));
+            }
+
+            using var fs = new FileStream(output, FileMode.Create);
+            using var bw = new BinaryWriter(fs);
+            bw.BaseStream.Write(introBytes.ToArray(), 0, introBytes.Count);
+            bw.BaseStream.Write(imageContentBytes.ToArray(), 0, imageContentBytes.Count);
         }
     }
 }
