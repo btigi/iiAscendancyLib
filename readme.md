@@ -15,7 +15,7 @@ The library supports:
 
 Sample code to use the library is provided below.
 
-```
+```csharp
 var gameDir = @"D:\Games\ascendancy\ASCEND\";
 var assetDir = @"D:\data\Ascendancy\";
 
