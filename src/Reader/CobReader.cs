@@ -9,7 +9,7 @@ namespace ii.AscendancyLib.Reader
     {
         public CobFile Read(string filename)
         {
-            using FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+            using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
             var f = Read(fs);
             return f;
         }

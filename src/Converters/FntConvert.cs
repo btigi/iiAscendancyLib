@@ -13,13 +13,12 @@ namespace ii.AscendancyLib.Converters
         private const int Signature = 0x00002e31;
         private const int PaletteSize = 256;
 
-        public FntFile ConvertFnt(string sourceFile, string palFile)
+        public FntFile ConvertFnt(Stream sourceStream, string palFile)
         {
             var fntFile = new FntFile();
             var palette = ReadPalette(palFile);
 
-            using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
-            using var br = new BinaryReader(fs);
+            using var br = new BinaryReader(sourceStream, System.Text.Encoding.Default, leaveOpen: true);
 
             var signature = br.ReadInt32();
             if (signature != Signature)
@@ -43,7 +42,7 @@ namespace ii.AscendancyLib.Converters
             for (var i = 0; i < characterCount; i++)
             {
                 var offChar = offsets[i];
-                fs.Seek(offChar, SeekOrigin.Begin);
+                sourceStream.Seek(offChar, SeekOrigin.Begin);
 
                 var width = br.ReadInt32();
                 if (width == 0)
@@ -69,6 +68,12 @@ namespace ii.AscendancyLib.Converters
             }
 
             return fntFile;
+        }
+
+        public FntFile ConvertFnt(string sourceFile, string palFile)
+        {
+            using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
+            return ConvertFnt(fs, palFile);
         }
 
         private static byte[][] ReadPalette(string palFile, int size = PaletteSize)
