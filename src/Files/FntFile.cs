@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
+using SixLabors.ImageSharp;
 
 namespace ii.AscendancyLib.Files
 {
     public class FntFile
     {
-        public List<Bitmap> Images = new List<Bitmap>();
+        public List<Image> Images = new List<Image>();
     }
 }

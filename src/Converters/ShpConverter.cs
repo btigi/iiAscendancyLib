@@ -2,11 +2,10 @@
 using ii.AscendancyLib.Files;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+using ImageInfo = ii.AscendancyLib.Binary.ImageInfo;
 
 namespace ii.AscendancyLib.Converters
 {
@@ -158,31 +157,19 @@ namespace ii.AscendancyLib.Converters
 
                     var width = imageInfo.Width + 1;
                     var height = imageInfo.Height + 1;
-                    var bitmap = new Bitmap(width, height);
+                    var image = new Image<Rgba32>(width, height);
 
-                    var bData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
-                    var size = bData.Stride * bData.Height;
-                    var data = new byte[size];
-                    Marshal.Copy(bData.Scan0, data, 0, size);
-                    var cnt = 0;
                     for (int y = 0; y < height; y++)
                     {
                         for (int x = 0; x < width; x++)
                         {
                             var s = DefaultPalette.defaultPalette[pixels[x, y]];
                             var c = DefaultPalette.GetColour(s);
-                            data[cnt] = c.B;
-                            data[cnt + 1] = c.G;
-                            data[cnt + 2] = c.R;
-                            data[cnt + 3] = c.A;
-                            cnt += 4;
+                            image[x, y] = c;
                         }
                     }
 
-                    Marshal.Copy(data, 0, bData.Scan0, data.Length);
-                    bitmap.UnlockBits(bData);
-
-                    shpFile.Images.Add(bitmap);
+                    shpFile.Images.Add(image);
                 }
                 catch
                 {
@@ -217,69 +204,64 @@ namespace ii.AscendancyLib.Converters
                 imagesAdded++;
                 offset = 8 + (imagesAdded * 8) + imageContentBytes.Count;
 
-                var bitmap = new Bitmap(file);
+                using var image = Image.Load<Rgba32>(file);
 
                 var imageHeader = new ImageHeader();
-                imageHeader.Height = (short)bitmap.Height;
+                imageHeader.Height = (short)image.Height;
                 imageHeader.YCentre = 0;
                 imageHeader.XCentre = 0;
                 imageHeader.xStart = 0;
                 imageHeader.yStart = 0;
-                imageHeader.xEnd = (short)bitmap.Width;
-                imageHeader.yEnd = (short)bitmap.Height;
-                imageHeader.Width = (short)bitmap.Width;
+                imageHeader.xEnd = (short)image.Width;
+                imageHeader.yEnd = (short)image.Height;
+                imageHeader.Width = (short)image.Width;
 
                 imageContentBytes.AddRange(Common.WriteStruct(imageHeader));
 
-                var bData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
-                var size = bData.Stride * bData.Height;
-                var data = new byte[size];
-                Marshal.Copy(bData.Scan0, data, 0, size);
-
                 var brightnessMultiplier = 4;
-                for (int i = 0; i < size / 4; i += 4)
+                for (int y = 0; y < image.Height; y++)
                 {
-                    var r = data[i + 0] / brightnessMultiplier;
-                    var g = data[i + 1] / brightnessMultiplier;
-                    var b = data[i + 2] / brightnessMultiplier;
-                    var a = data[i + 3] / brightnessMultiplier;
-                    var colour = $"{b:X2}{g:X2}{r:X2}";
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        var pixel = image[x, y];
+                        var r = pixel.R / brightnessMultiplier;
+                        var g = pixel.G / brightnessMultiplier;
+                        var b = pixel.B / brightnessMultiplier;
+                        var colour = $"{b:X2}{g:X2}{r:X2}";
 
-                    var paleteIndex = DefaultPalette.defaultPalette.IndexOf(colour);
-                    //if (colour == "30200C" && false)
-                    //{
-                    //    imageContentBytes.Add(62);
-                    //    imageContentBytes.Add(242);
-                    //}
-                    //if (colour == "24A410" && false)
-                    //{
-                    //    imageContentBytes.Add(62);
-                    //    imageContentBytes.Add(100);
-                    //}
-                    //if (colour == "24A410" || true)
-                    //{
-                    //    imageContentBytes.Add(62);
-                    //    imageContentBytes.Add(50);
-                    //}
+                        var paleteIndex = DefaultPalette.defaultPalette.IndexOf(colour);
+                        //if (colour == "30200C" && false)
+                        //{
+                        //    imageContentBytes.Add(62);
+                        //    imageContentBytes.Add(242);
+                        //}
+                        //if (colour == "24A410" && false)
+                        //{
+                        //    imageContentBytes.Add(62);
+                        //    imageContentBytes.Add(100);
+                        //}
+                        //if (colour == "24A410" || true)
+                        //{
+                        //    imageContentBytes.Add(62);
+                        //    imageContentBytes.Add(50);
+                        //}
 
-                    imageContentBytes.Add(1);
-                    imageContentBytes.Add((byte)paleteIndex);
+                        imageContentBytes.Add(1);
+                        imageContentBytes.Add((byte)paleteIndex);
 
-                    // 0 -> fill the rest of the row with the default colour
-                    // 1,x -> fill x bytes with default colour
-                    // ((infoByte & Common.Bit0) == 0) -> var length = infoByte >> 1; then 'read a byte to represet the colour, draw length bytes that colour'
-                    //if (i == 5)
-                    //{
-                    //    imageContentBytes.Add(62);
-                    //    imageContentBytes.Add(10);
-                    //}
-                    // ((infoByte & Common.Bit0) != 0) -> var length = infoByte >> 1; then 'read a byte to represet the colour, draw a byte', length times
+                        // 0 -> fill the rest of the row with the default colour
+                        // 1,x -> fill x bytes with default colour
+                        // ((infoByte & Common.Bit0) == 0) -> var length = infoByte >> 1; then 'read a byte to represet the colour, draw length bytes that colour'
+                        //if (i == 5)
+                        //{
+                        //    imageContentBytes.Add(62);
+                        //    imageContentBytes.Add(10);
+                        //}
+                        // ((infoByte & Common.Bit0) != 0) -> var length = infoByte >> 1; then 'read a byte to represet the colour, draw a byte', length times
 
-                    //imageContentBytes.Add(0);
+                        //imageContentBytes.Add(0);
+                    }
                 }
-
-                Marshal.Copy(data, 0, bData.Scan0, data.Length);
-                bitmap.UnlockBits(bData);
 
                 var imageInfo = new ImageInfo();
                 imageInfo.ImageOffset = (Int32)offset;

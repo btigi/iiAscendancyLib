@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>ii.AscendancyLib</RootNamespace>
     <AssemblyName>ii.AscendancyLib</AssemblyName>
-    <langversion>13.0</langversion>
+    <LangVersion>latest</LangVersion>
     <Copyright>Copyright ©  2025</Copyright>
     <Title>ii.AscendancyLib</Title>
     <Version>0.7.0.0-alpha.1</Version>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
   </ItemGroup>
 
 </Project>

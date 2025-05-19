@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Globalization;
 
 namespace ii.AscendancyLib
@@ -268,15 +268,29 @@ namespace ii.AscendancyLib
             "00003F"
         };
 
-        public static Color GetColour(string hexColor)
+        public static Rgba32 GetColour(string hexColor)
         {
+            if (string.IsNullOrEmpty(hexColor))
+                return new Rgba32(0, 0, 0);
+
+            if (hexColor.StartsWith("#"))
+                hexColor = hexColor.Substring(1);
+
+            if (hexColor.Length != 6)
+                return new Rgba32(0, 0, 0);
+
             // Colours from game.pal are too dark, we need to brighten them to get them to match the in-game values
             const int BrightnessMultiplier = 4;
 
             var red = int.Parse(hexColor.Substring(0, 2), NumberStyles.HexNumber) * BrightnessMultiplier;
             var green = int.Parse(hexColor.Substring(2, 2), NumberStyles.HexNumber) * BrightnessMultiplier;
             var blue = int.Parse(hexColor.Substring(4, 2), NumberStyles.HexNumber) * BrightnessMultiplier;
-            return Color.FromArgb(red, green, blue);
+
+            return new Rgba32(
+                (byte)Math.Min(255, red),
+                (byte)Math.Min(255, green),
+                (byte)Math.Min(255, blue)
+            );
         }
     }
 }

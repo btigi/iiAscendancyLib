@@ -1,10 +1,9 @@
 ﻿using ii.AscendancyLib.Files;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace ii.AscendancyLib.Converters
 {
@@ -50,21 +49,25 @@ namespace ii.AscendancyLib.Converters
                     continue;
                 }
 
-                var pixels = new byte[characterHeight * width * 4];
+                var image = new Image<Rgba32>(width, characterHeight);
                 for (int y = 0; y < characterHeight; y++)
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        Array.Copy(palette[br.ReadByte()], 0, pixels, (y * width + x) * 4, 4);
+                        var colorIndex = br.ReadByte();
+                        if (colorIndex == transparentColourIndex)
+                        {
+                            image[x, y] = new Rgba32(0, 0, 0, 0);
+                        }
+                        else
+                        {
+                            var color = palette[colorIndex];
+                            image[x, y] = new Rgba32(color[2], color[1], color[0], color[3]); // Swap R and B to match BGRA order
+                        }
                     }
                 }
 
-                var bitmap = new Bitmap(width, characterHeight, PixelFormat.Format32bppArgb);
-                var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, bitmap.PixelFormat);
-                var ptr = bmpData.Scan0;
-                Marshal.Copy(pixels, 0, ptr, pixels.Length);
-                bitmap.UnlockBits(bmpData);
-                fntFile.Images.Add(bitmap);
+                fntFile.Images.Add(image);
             }
 
             return fntFile;
