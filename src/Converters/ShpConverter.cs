@@ -14,15 +14,15 @@ namespace ii.AscendancyLib.Converters
         private string fname;
         private bool Debug { get; set; }
 
-        public ShpFile Read(string filename)
+        public ShpFile ConvertShp(string filename)
         {
             fname = Path.GetFileName(filename);
             using FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-            var f = Read(fs);
+            var f = ConvertShp(fs);
             return f;
         }
 
-        public ShpFile Read(Stream s)
+        public ShpFile ConvertShp(Stream s)
         {
             using BinaryReader br = new(s);
             var shpFile = ParseFile(br);

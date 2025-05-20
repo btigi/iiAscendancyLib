@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <Copyright>Copyright ©  2025</Copyright>
     <Title>ii.AscendancyLib</Title>
-    <Version>0.7.0.0-alpha.1</Version>
+    <Version>0.7.5.0-alpha.1</Version>
     <Authors>iggti</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/btigi/iiAscendancyLib</RepositoryUrl>
