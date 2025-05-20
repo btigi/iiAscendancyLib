@@ -7,16 +7,21 @@
     <LangVersion>latest</LangVersion>
     <Copyright>Copyright ©  2025</Copyright>
     <Title>ii.AscendancyLib</Title>
-    <Version>0.7.5.0-alpha.1</Version>
+    <Version>0.7.7.0-alpha.1</Version>
     <Authors>iggti</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/btigi/iiAscendancyLib</RepositoryUrl>
     <Description>A library to facilitate editing of the 1995 Logic Factory game Ascendancy.</Description>
     <PackageTags>ascendancy;logic-factory</PackageTags>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\readme.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

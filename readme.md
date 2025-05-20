@@ -1,15 +1,18 @@
 ﻿iiAscendancyLib
 =========
 
-iiAscendancyLib is a C# library targetting .NET Standard 2.0, supporting the modification of files relating to Ascendancy, the 1995 4X science fiction turn-based strategy computer game.
+iiAscendancyLib is a C# library targetting .NET8, supporting the modification of files relating to Ascendancy, the 1995 4X science fiction turn-based strategy computer game.
 The library supports:
 
-- cob - read, write
-- raw - read
-- sav - read, write
-- shp - read
-- wav - read
-- voc - read
+| Name     | Read | Write | Comment |
+|----------|:----:|-------|:--------|
+| COB      | ✔   |   ✔   |
+| RAW      | ✔   |   ✗   |
+| SAV      | ✔   |   ✔   | File format is not fully decoded
+| SHP      | ✔   |   ✗   |
+| WAV      | ✔   |   ✗   |
+| VOC      | ✔   |   ✗   |
+
 
 ## Usage
 
@@ -84,7 +87,7 @@ foreach (var shp in shps)
 {
     try
     {
-        var shpFile = converter.Read(shp);
+        var shpFile = converter.ConvertShp(shp);
         shpFile.Images.First().Save(Path.Combine(assetDir, "ASCEND01", $"{Path.GetFileNameWithoutExtension(shp)}.bmp"), ImageFormat.Bmp);
     }
     catch (Exception ex)
@@ -107,10 +110,6 @@ Console.WriteLine($"Saving resume.new");
 var savWriter = new SavWriter();
 savWriter.Save(Path.Combine(assetDir, "resume.new"), savegame);
 ```
-
-## Download
-
-Compiled downloads are not available.
 
 ## Compiling
 
