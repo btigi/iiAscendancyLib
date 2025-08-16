@@ -7,6 +7,7 @@ The library supports:
 | Name     | Read | Write | Comment |
 |----------|:----:|-------|:--------|
 | COB      | ✔   |   ✔   |
+| FNT      | ✔   |   ✗   |
 | RAW      | ✔   |   ✗   |
 | SAV      | ✔   |   ✔   | File format is not fully decoded
 | SHP      | ✔   |   ✗   |
