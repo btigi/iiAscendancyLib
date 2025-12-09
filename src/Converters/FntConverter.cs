@@ -86,7 +86,7 @@ namespace ii.AscendancyLib.Converters
             var rgb = new byte[3];
             for (int index = 0; index < size; index++)
             {
-                handle.Read(rgb, 0, 3);
+                handle.ReadExactly(rgb, 0, 3);
                 entries[index] = [(byte)(rgb[0] << 2), (byte)(rgb[1] << 2), (byte)(rgb[2] << 2), (byte)0xFF];
             }
             return entries;
