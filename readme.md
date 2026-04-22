@@ -1,15 +1,15 @@
 ﻿iiAscendancyLib
 =========
 
-iiAscendancyLib is a C# library targetting .NET8, supporting the modification of files relating to Ascendancy, the 1995 4X science fiction turn-based strategy computer game.
+iiAscendancyLib is a C# library targetting .NET10, supporting the modification of files relating to Ascendancy, the 1995 4X science fiction turn-based strategy computer game.
 The library supports:
 
 | Name     | Read | Write | Comment |
 |----------|:----:|-------|:--------|
 | COB      | ✔   |   ✔   |
-| FLC      | ✔   |   ✗   | Autodesk FLC, see ii.FLC
+| FLC      | ➜   |   ✗   | Autodesk FLC, see ii.FLC
 | FNT      | ✔   |   ✔   |
-| RAW      | ✔   |   ✗   |
+| RAW      | ✔   |   ✔   |
 | SAV      | ✔   |   ✔   | File format is not fully decoded
 | SHP      | ✔   |   ✔   |
 | WAV      | ✔   |   ✗   |

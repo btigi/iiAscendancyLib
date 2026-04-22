@@ -74,5 +74,14 @@ namespace ii.AscendancyLib.Converters
             bw.BaseStream.CopyTo(outfs);
             outfs.Flush(flushToDisk: true);
         }
+
+        public void Write(string filename, byte[] wavFile)
+        {
+            ArgumentNullException.ThrowIfNull(filename);
+            ArgumentNullException.ThrowIfNull(wavFile);
+
+            WavPcm.ReadValidatedPcm(wavFile, out _, out _, out _, out var pcm);
+            File.WriteAllBytes(filename, pcm);
+        }
     }
 }
