@@ -13,7 +13,7 @@ The library supports:
 | SAV      | ✔   |   ✔   | File format is not fully decoded
 | SHP      | ✔   |   ✔   |
 | WAV      | ✔   |   ✗   |
-| VOC      | ✔   |   ✗   |
+| VOC      | ✔   |   ✔   |
 
 
 ## Usage
