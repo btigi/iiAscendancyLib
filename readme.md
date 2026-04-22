@@ -83,13 +83,13 @@ player.Stop();
 
 //  Convert all SHP files
 Console.WriteLine($"Converting all SHP files in ASCEND01.COB and saving the first frame");
-var converter = new ShpConverter();
+var shpReader = new ShpReader();
 List<string> shps = new List<string>(Directory.EnumerateFiles(Path.Combine(assetDir, "ASCEND01", "data"), "*.shp"));
 foreach (var shp in shps)
 {
     try
     {
-        var shpFile = converter.ConvertShp(shp);
+        var shpFile = shpReader.Read(shp);
         shpFile.Images.First().Save(Path.Combine(assetDir, "ASCEND01", $"{Path.GetFileNameWithoutExtension(shp)}.bmp"), ImageFormat.Bmp);
     }
     catch (Exception ex)
