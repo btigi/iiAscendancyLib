@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace ii.AscendancyLib.Converters
+namespace ii.AscendancyLib.Reader
 {
-    public class RawConverter
+    public class RawReader
     {
         private const string WAV_CHUNK_WAVFILE = "RIFF";
         private const string WAV_CHUNK_FORMAT = "fmt ";
@@ -14,7 +14,7 @@ namespace ii.AscendancyLib.Converters
         private const string WAV_CHUNK_DATA = "data";
         private const string WAV_FILE_BODY_CONSTANT = "WAVE";
 
-        public void ConvertRaw(string sourceFile, string destFile)
+        public void Read(string sourceFile, string destFile)
         {
             using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
             using var s = new MemoryStream();
@@ -73,15 +73,6 @@ namespace ii.AscendancyLib.Converters
             bw.BaseStream.Position = 0;
             bw.BaseStream.CopyTo(outfs);
             outfs.Flush(flushToDisk: true);
-        }
-
-        public void Write(string filename, byte[] wavFile)
-        {
-            ArgumentNullException.ThrowIfNull(filename);
-            ArgumentNullException.ThrowIfNull(wavFile);
-
-            WavPcm.ReadValidatedPcm(wavFile, out _, out _, out _, out var pcm);
-            File.WriteAllBytes(filename, pcm);
         }
     }
 }

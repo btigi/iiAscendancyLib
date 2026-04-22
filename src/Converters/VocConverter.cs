@@ -1,4 +1,5 @@
 ﻿using ii.AscendancyLib.Binary;
+using ii.AscendancyLib.Reader;
 using System;
 using System.IO;
 using System.Linq;
@@ -34,8 +35,8 @@ namespace ii.AscendancyLib.Converters
                         // Many files have the .voc extension but are actually just .raw files
                         if (fallbackToRaw)
                         {
-                            var rawConverter = new RawConverter();
-                            rawConverter.ConvertRaw(sourceFile, destFile);
+                            var rawConverter = new RawReader();
+                            rawConverter.Read(sourceFile, destFile);
                         }
                         return;
                     }

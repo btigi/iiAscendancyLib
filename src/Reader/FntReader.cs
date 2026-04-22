@@ -5,14 +5,14 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
 
-namespace ii.AscendancyLib.Converters
+namespace ii.AscendancyLib.Reader
 {
-    public class FntConverter
+    public class FntReader
     {
         private const int Signature = 0x00002e31;
         private const int PaletteSize = 256;
 
-        public FntFile ConvertFnt(Stream sourceStream, string palFile)
+        public FntFile Read(Stream sourceStream, string palFile)
         {
             var fntFile = new FntFile();
             var palette = ReadPalette(palFile);
@@ -77,10 +77,10 @@ namespace ii.AscendancyLib.Converters
             return fntFile;
         }
 
-        public FntFile ConvertFnt(string sourceFile, string palFile)
+        public FntFile Read(string sourceFile, string palFile)
         {
             using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
-            return ConvertFnt(fs, palFile);
+            return Read(fs, palFile);
         }
 
         private static byte[][] ReadPalette(string palFile, int size = PaletteSize)
