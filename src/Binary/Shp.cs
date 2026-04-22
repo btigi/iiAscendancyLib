@@ -21,8 +21,8 @@ namespace ii.AscendancyLib.Binary
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ImageHeader
     {
-        public Int16 Height; // need to add 1
-        public Int16 Width; // need to add 1
+        public Int16 Height;
+        public Int16 Width;
         public Int16 YCentre;
         public Int16 XCentre;
         public Int32 xStart;

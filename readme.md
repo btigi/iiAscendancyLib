@@ -11,7 +11,7 @@ The library supports:
 | FNT      | ✔   |   ✔   |
 | RAW      | ✔   |   ✗   |
 | SAV      | ✔   |   ✔   | File format is not fully decoded
-| SHP      | ✔   |   ✗   |
+| SHP      | ✔   |   ✔   |
 | WAV      | ✔   |   ✗   |
 | VOC      | ✔   |   ✗   |
 
