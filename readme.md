@@ -7,7 +7,8 @@ The library supports:
 | Name     | Read | Write | Comment |
 |----------|:----:|-------|:--------|
 | COB      | ✔   |   ✔   |
-| FNT      | ✔   |   ✗   |
+| FLC      | ✔   |   ✗   | Autodesk FLC, see ii.FLC
+| FNT      | ✔   |   ✔   |
 | RAW      | ✔   |   ✗   |
 | SAV      | ✔   |   ✔   | File format is not fully decoded
 | SHP      | ✔   |   ✗   |

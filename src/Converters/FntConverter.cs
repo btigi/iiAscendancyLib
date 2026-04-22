@@ -30,6 +30,9 @@ namespace ii.AscendancyLib.Converters
             var transparentColourIndex = br.ReadInt32();
             palette[transparentColourIndex][3] = 0x00; // Explicitly set the alpha channel to 0
 
+            fntFile.CharacterHeight = characterHeight;
+            fntFile.TransparentColourIndex = transparentColourIndex;
+
             // Read all offsets first
             var offsets = new List<int>();
             for (var i = 0; i < characterCount; i++)
@@ -46,6 +49,7 @@ namespace ii.AscendancyLib.Converters
                 var width = br.ReadInt32();
                 if (width == 0)
                 {
+                    fntFile.Images.Add(null);
                     continue;
                 }
 
