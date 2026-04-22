@@ -60,8 +60,8 @@ cobWriter.Write(Path.Combine(assetDir, "00COPY.COB"), Path.Combine(assetDir, "AS
 
 // Convert a VOC to a WAV
 Console.WriteLine($"Converting VOC to WAV");
-var vc = new VocConverter();
-vc.ConvertVoc(Path.Combine(assetDir, "ASCEND01", "data", "blueexit.voc"), Path.Combine(assetDir, "ASCEND01", "blueexit.wav"), true);
+var vocReader = new VocReader();
+vocReader.Read(Path.Combine(assetDir, "ASCEND01", "data", "blueexit.voc"), Path.Combine(assetDir, "ASCEND01", "blueexit.wav"), true);
 
 // Convert a RAW to a WAV
 Console.WriteLine($"Converting RAW to WAV");

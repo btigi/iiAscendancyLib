@@ -1,23 +1,23 @@
-﻿using ii.AscendancyLib.Binary;
-using ii.AscendancyLib.Reader;
+using ii.AscendancyLib.Binary;
 using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-namespace ii.AscendancyLib.Converters
+
+namespace ii.AscendancyLib.Reader
 {
-    public class VocConverter
+    public class VocReader
     {
         private const string WAV_CHUNK_WAVFILE = "RIFF";
         private const string WAV_CHUNK_FORMAT = "fmt ";
         private const string WAV_CHUNK_FACT = "fact";
         private const string WAV_CHUNK_DATA = "data";
         private const string WAV_FILE_BODY_CONSTANT = "WAVE";
-        private readonly string VOC_IDENTIFIER = "Creative Voice File" + (char)0x1a; // Can't declare this const because it's somehow non-deterministic...
+        private readonly string VOC_IDENTIFIER = "Creative Voice File" + (char)0x1a;
 
-        public void ConvertVoc(string sourceFile, string destFile, bool fallbackToRaw)
+        public void Read(string sourceFile, string destFile, bool fallbackToRaw)
         {
-            var blockType = VocBlockType.Silence; // Initialize to anything other than terminator
+            var blockType = VocBlockType.Silence;
 
             using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
             using var br = new BinaryReader(fs);
@@ -26,17 +26,14 @@ namespace ii.AscendancyLib.Converters
             {
                 var header = (VocHeader)Common.ReadStruct(br, typeof(VocHeader));
 
-                // If we do this as a direct comparison it always fails, so we take the long way round
                 var identifier = VOC_IDENTIFIER.ToCharArray();
                 for (var i = 0; i < VOC_IDENTIFIER.Length; i++)
                 {
                     if (header.Identifier[i] != identifier[i])
                     {
-                        // Many files have the .voc extension but are actually just .raw files
                         if (fallbackToRaw)
                         {
-                            var rawConverter = new RawReader();
-                            rawConverter.Read(sourceFile, destFile);
+                            new RawReader().Read(sourceFile, destFile);
                         }
                         return;
                     }
@@ -200,9 +197,9 @@ namespace ii.AscendancyLib.Converters
             }
         }
 
-        private WavChunkFormatBody GetWavChunkFormat()
+        private static WavChunkFormatBody GetWavChunkFormat()
         {
-            var format = new WavChunkFormatBody
+            return new WavChunkFormatBody
             {
                 Codec = 1,
                 NumChannels = 1,
@@ -212,79 +209,6 @@ namespace ii.AscendancyLib.Converters
                 BitsPerSample = 8,
                 Constant0 = 0
             };
-            return format;
         }
-
-        public void Write(string filename, byte[] wavFile)
-        {
-            ArgumentNullException.ThrowIfNull(filename);
-            ArgumentNullException.ThrowIfNull(wavFile);
-
-            WavPcm.ReadValidatedPcm(wavFile, out var sampleRate, out var numChannels, out var bitsPerSample, out var pcm);
-
-            var format2Size = Marshal.SizeOf<VocSampleFormat2>();
-            var blockPayloadSize = (uint)(format2Size + pcm.Length);
-            if (blockPayloadSize > 0xFFFFFF)
-            {
-                throw new InvalidDataException("WAV PCM data is too large for a 24-bit VOC block size.");
-            }
-
-            using var fs = new FileStream(filename, FileMode.Create, FileAccess.Write);
-            using var bw = new BinaryWriter(fs);
-
-            bw.Write(BuildVocHeader());
-
-            bw.Write((byte)VocBlockType.NewSampleData2);
-            WriteUInt24LE(bw, blockPayloadSize);
-
-            var vocFormat2 = new VocSampleFormat2
-            {
-                SamplesPerSecond = sampleRate,
-                BitsPerSample = (byte)bitsPerSample,
-                Channels = (byte)numChannels,
-                Format = 0,
-                Reserved = 0
-            };
-            bw.Write(Common.WriteStruct(vocFormat2));
-            bw.Write(pcm);
-            bw.Write((byte)VocBlockType.Terminator);
-        }
-
-        private byte[] BuildVocHeader()
-        {
-            var header = new VocHeader
-            {
-                Identifier = VOC_IDENTIFIER.ToCharArray(),
-                FirstDataBlock = (short)Marshal.SizeOf<VocHeader>(),
-                MajorVersion = 1,
-                MinorVersion = 20,
-                Checksum = 0
-            };
-
-            var bytes = Common.WriteStruct(header);
-            ushort sum = 0;
-            for (var i = 0; i < 24; i++)
-            {
-                sum += bytes[i];
-            }
-
-            var checksum = (ushort)~sum;
-            bytes[24] = (byte)(checksum & 0xFF);
-            bytes[25] = (byte)(checksum >> 8);
-            return bytes;
-        }
-
-        private static void WriteUInt24LE(BinaryWriter bw, uint value)
-        {
-            if (value > 0xFFFFFF)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
-
-            bw.Write((byte)(value & 0xFF));
-            bw.Write((byte)((value >> 8) & 0xFF));
-            bw.Write((byte)((value >> 16) & 0xFF));
-        }
-
     }
 }
