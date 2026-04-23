@@ -14,7 +14,7 @@ namespace ii.AscendancyLib.Reader
         private const string WAV_CHUNK_DATA = "data";
         private const string WAV_FILE_BODY_CONSTANT = "WAVE";
 
-        public void Read(string sourceFile, string destFile)
+        public byte[] Read(string sourceFile)
         {
             using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
             using var s = new MemoryStream();
@@ -69,10 +69,10 @@ namespace ii.AscendancyLib.Reader
 
             fs.CopyTo(bw.BaseStream);
 
-            using FileStream outfs = new(destFile, FileMode.Create, FileAccess.Write);
+            using var ms = new MemoryStream();
             bw.BaseStream.Position = 0;
-            bw.BaseStream.CopyTo(outfs);
-            outfs.Flush(flushToDisk: true);
+			bw.BaseStream.CopyTo(ms);
+            return ms.ToArray();
         }
     }
 }

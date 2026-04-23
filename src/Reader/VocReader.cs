@@ -1,8 +1,10 @@
-using ii.AscendancyLib.Binary;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using ii.AscendancyLib.Binary;
 
 namespace ii.AscendancyLib.Reader
 {
@@ -15,8 +17,10 @@ namespace ii.AscendancyLib.Reader
         private const string WAV_FILE_BODY_CONSTANT = "WAVE";
         private readonly string VOC_IDENTIFIER = "Creative Voice File" + (char)0x1a;
 
-        public void Read(string sourceFile, string destFile, bool fallbackToRaw)
+        public List<(byte[], string)> Read(string sourceFile, bool fallbackToRaw)
         {
+            var result = new List<(byte[], string)>();
+
             var blockType = VocBlockType.Silence;
 
             using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
@@ -33,9 +37,9 @@ namespace ii.AscendancyLib.Reader
                     {
                         if (fallbackToRaw)
                         {
-                            new RawReader().Read(sourceFile, destFile);
-                        }
-                        return;
+                            result.Add((new RawReader().Read(sourceFile), string.Empty));
+                            return result;
+						}
                     }
                 }
 
@@ -54,10 +58,6 @@ namespace ii.AscendancyLib.Reader
                 var VocSampleFormatSize = Marshal.SizeOf(vocSampleFormatSizer);
                 var VocSampleFormat2Size = Marshal.SizeOf(vocSampleFormat2Sizer);
 
-                var fpath = Path.GetDirectoryName(destFile);
-                var fname = Path.GetFileNameWithoutExtension(destFile);
-                var fext = Path.GetExtension(destFile);
-
                 br.BaseStream.Seek(header.FirstDataBlock, SeekOrigin.Begin);
                 do
                 {
@@ -74,7 +74,7 @@ namespace ii.AscendancyLib.Reader
                         {
                             case VocBlockType.Text:
                                 var text = br.ReadBytes((int)BlockSize);
-                                File.WriteAllBytes(String.Format(@"{0}{1}_{2}.txt", String.IsNullOrEmpty(fpath) ? String.Empty : fpath + "\\", fname, SampleNumber), text);
+                                result.Add(([], Encoding.ASCII.GetString(text)));
                                 SampleNumber++;
                                 break;
 
@@ -124,11 +124,11 @@ namespace ii.AscendancyLib.Reader
 
                                 fs.CopyTo(bw.BaseStream);
 
-                                using (FileStream outfs = new(String.Format(@"{0}{1}_{2}{3}", String.IsNullOrEmpty(fpath) ? String.Empty : fpath + "\\", fname, SampleNumber, fext), FileMode.Create, FileAccess.Write))
+                                using (var ms = new MemoryStream())
                                 {
                                     bw.BaseStream.Position = 0;
-                                    bw.BaseStream.CopyTo(outfs);
-                                    fs.Flush(flushToDisk: true);
+                                    bw.BaseStream.CopyTo(ms);
+                                    result.Add((ms.ToArray(), string.Empty));
                                 }
 
                                 SampleNumber++;
@@ -180,11 +180,11 @@ namespace ii.AscendancyLib.Reader
 
                                 fs.CopyTo(bw.BaseStream);
 
-                                using (var outfs = new FileStream(String.Format(@"{0}{1}_{2}{3}", String.IsNullOrEmpty(fpath) ? String.Empty : fpath + "\\", fname, SampleNumber, fext), FileMode.Create, FileAccess.Write))
+                                using (var ms = new MemoryStream())
                                 {
                                     bw.BaseStream.Position = 0;
-                                    bw.BaseStream.CopyTo(outfs);
-                                    fs.Flush(flushToDisk: true);
+                                    bw.BaseStream.CopyTo(ms);
+                                    result.Add((ms.ToArray(), string.Empty));
                                 }
 
                                 SampleNumber++;
@@ -195,7 +195,9 @@ namespace ii.AscendancyLib.Reader
                     }
                 } while (blockType != VocBlockType.Terminator);
             }
-        }
+
+            return result;
+		}
 
         private static WavChunkFormatBody GetWavChunkFormat()
         {

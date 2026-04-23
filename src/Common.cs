@@ -39,32 +39,6 @@ namespace ii.AscendancyLib
         public const Int32 Bit30 = 2 << 29;
         public const Int32 Bit31 = 2 << 30;
 
-        public static string TryGetString(char[] chars)
-        {
-            if ((chars.Length > 0) && (chars[0] != '\0'))
-            {
-                //return new string(chars).TrimEnd('\0');
-                var s = new string(chars);
-                var firstNull = s.IndexOf('\0');
-                firstNull = firstNull == -1 ? s.Length : firstNull;
-                return s.Substring(0, firstNull);
-            }
-            return String.Empty;
-        }
-
-        public static char[] ToSizedCharArray(string c, int length = 8)
-        {
-            c = c.PadRight(length, '\0');
-            var array = new char[length];
-            var i = 0;
-            while (i < length)
-            {
-                array[i] = c[i];
-                i++;
-            }
-            return array;
-        }
-
         public static Object ReadStruct(BinaryReader br, Type t)
         {
             var buff = br.ReadBytes(Marshal.SizeOf(t));
