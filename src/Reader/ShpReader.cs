@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using ii.AscendancyLib.Binary;
 using ii.AscendancyLib.Files;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using ImageInfo = ii.AscendancyLib.Binary.ImageInfo;
 
 namespace ii.AscendancyLib.Reader
@@ -12,6 +12,12 @@ namespace ii.AscendancyLib.Reader
 	public class ShpReader
 	{
 		public bool Debug { get; set; }
+
+		public ShpFile Read(byte[] bytes)
+		{
+			using var ms = new MemoryStream(bytes);
+			return Read(ms);
+		}
 
 		public ShpFile Read(string filename)
 		{

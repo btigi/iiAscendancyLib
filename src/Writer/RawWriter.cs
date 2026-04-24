@@ -2,7 +2,7 @@
 using System.IO;
 using ii.AscendancyLib.Binary;
 
-namespace ii.AscendancyLib.Converters
+namespace ii.AscendancyLib.Writer
 {
     public class RawWriter
     {

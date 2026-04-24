@@ -20,7 +20,7 @@ namespace ii.AscendancyLib.Writer
             foreach (var file in filesToAdd)
             {
                 var filename = new FileName();
-                filename.filename = file.Replace(cobRootDirectory, String.Empty).ToArray();
+                filename.filename = [.. file.Replace(cobRootDirectory, String.Empty)];
                 if (filename.filename.Length < MaximumFileNameLength)
                 {
                     Array.Resize(ref filename.filename, MaximumFileNameLength);
@@ -40,7 +40,7 @@ namespace ii.AscendancyLib.Writer
             foreach (var (content, path) in entries)
             {
                 var filename = new FileName();
-                filename.filename = path.ToArray();
+                filename.filename = [.. path];
                 if (filename.filename.Length < MaximumFileNameLength)
                 {
                     Array.Resize(ref filename.filename, MaximumFileNameLength);

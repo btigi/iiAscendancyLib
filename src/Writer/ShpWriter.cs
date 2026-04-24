@@ -71,8 +71,8 @@ namespace ii.AscendancyLib.Writer
 
             using var fs = new FileStream(output, FileMode.Create);
             using var bw = new BinaryWriter(fs);
-            bw.BaseStream.Write(introBytes.ToArray(), 0, introBytes.Count);
-            bw.BaseStream.Write(imageContentBytes.ToArray(), 0, imageContentBytes.Count);
+            bw.BaseStream.Write([.. introBytes], 0, introBytes.Count);
+            bw.BaseStream.Write([.. imageContentBytes], 0, imageContentBytes.Count);
         }
 
         private static byte FindPaletteIndex(Rgba32 pixel)

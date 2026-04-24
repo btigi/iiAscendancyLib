@@ -17,6 +17,21 @@ namespace ii.AscendancyLib.Reader
         public byte[] Read(string sourceFile)
         {
             using var fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read);
+            return Read(fs);
+        }
+
+        public byte[] Read(byte[] data)
+        {
+            using var ms = new MemoryStream(data, writable: false);
+            return Read(ms);
+        }
+
+        public byte[] Read(Stream input)
+        {
+            ArgumentNullException.ThrowIfNull(input);
+            if (!input.CanSeek) throw new ArgumentException("Stream must be seekable.", nameof(input));
+            if (input.Position != 0) input.Position = 0;
+
             using var s = new MemoryStream();
             using var bw = new BinaryWriter(s);
 
@@ -33,19 +48,19 @@ namespace ii.AscendancyLib.Reader
                 BitsPerSample = 8,
                 Constant0 = 0
             };
-            var rawDataSize = (UInt32)fs.Length;
+            var rawDataSize = (UInt32)input.Length;
 
             byte[] wavChunkHeaderAsBytes;
-            wavChunkHeader.WavChunkID = WAV_CHUNK_WAVFILE.ToArray();
+            wavChunkHeader.WavChunkID = [.. WAV_CHUNK_WAVFILE];
             wavChunkHeader.ChunkSize = (UInt32)(Marshal.SizeOf(wavChunkWavFileBody) + Marshal.SizeOf(wavChunkHeader) + Marshal.SizeOf(wavChunkFormatBody) + Marshal.SizeOf(wavChunkHeader) + Marshal.SizeOf(wavChunkFactBody) + Marshal.SizeOf(wavChunkHeader) + rawDataSize);
             wavChunkHeaderAsBytes = Common.WriteStruct(wavChunkHeader);
             bw.Write(wavChunkHeaderAsBytes);
 
-            wavChunkWavFileBody.ConstantWave = WAV_FILE_BODY_CONSTANT.ToArray();
+            wavChunkWavFileBody.ConstantWave = [.. WAV_FILE_BODY_CONSTANT];
             var wavChunkWavFileBodyAsBytes = Common.WriteStruct(wavChunkWavFileBody);
             bw.Write(wavChunkWavFileBodyAsBytes);
 
-            wavChunkHeader.WavChunkID = WAV_CHUNK_FORMAT.ToArray();
+            wavChunkHeader.WavChunkID = [.. WAV_CHUNK_FORMAT];
             wavChunkHeader.ChunkSize = (UInt32)Marshal.SizeOf(wavChunkFormatBody);
             wavChunkHeaderAsBytes = Common.WriteStruct(wavChunkHeader);
             bw.Write(wavChunkHeaderAsBytes);
@@ -53,7 +68,7 @@ namespace ii.AscendancyLib.Reader
             var WavChunkFormatBodyAsBytes = Common.WriteStruct(wavChunkFormatBody);
             bw.Write(WavChunkFormatBodyAsBytes);
 
-            wavChunkHeader.WavChunkID = WAV_CHUNK_FACT.ToArray();
+            wavChunkHeader.WavChunkID = [.. WAV_CHUNK_FACT];
             wavChunkHeader.ChunkSize = (UInt32)Marshal.SizeOf(wavChunkFactBody);
             wavChunkHeaderAsBytes = Common.WriteStruct(wavChunkHeader);
             bw.Write(wavChunkHeaderAsBytes);
@@ -62,12 +77,12 @@ namespace ii.AscendancyLib.Reader
             var WavChunkFactBodyAsBytes = Common.WriteStruct(wavChunkFactBody);
             bw.Write(WavChunkFactBodyAsBytes);
 
-            wavChunkHeader.WavChunkID = WAV_CHUNK_DATA.ToArray();
+            wavChunkHeader.WavChunkID = [.. WAV_CHUNK_DATA];
             wavChunkHeader.ChunkSize = rawDataSize;
             wavChunkHeaderAsBytes = Common.WriteStruct(wavChunkHeader);
             bw.Write(wavChunkHeaderAsBytes);
 
-            fs.CopyTo(bw.BaseStream);
+            input.CopyTo(bw.BaseStream);
 
             using var ms = new MemoryStream();
             bw.BaseStream.Position = 0;
