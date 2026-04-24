@@ -6,7 +6,7 @@ namespace ii.AscendancyLib.Writer
 {
     public class SavWriter
     {
-        public void Save(string filename, SavFile file)
+        public void Write(string filename, SavFile file)
         {
             using var fsout = new FileStream(filename, FileMode.Create, FileAccess.Write);
             using var brout = new BinaryWriter(fsout);
