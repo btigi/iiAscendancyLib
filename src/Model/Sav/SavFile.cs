@@ -22,6 +22,6 @@ namespace ii.AscendancyLib.Model.Sav
         public short Unknown6;
         public List<StarLane> StarLanes = new List<StarLane>();
         public List<StarLaneCount> StarLaneCounts = new List<StarLaneCount>();
-        public byte[] Unknown7 = new byte[7672];
+        public SavTrailer Trailer;
     }
 }

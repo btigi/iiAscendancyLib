@@ -95,7 +95,7 @@ namespace ii.AscendancyLib.Writer
                 brout.Write(t2);
             }
 
-            brout.Write(file.Unknown7);
+            brout.Write(Common.WriteStruct(file.Trailer));
         }
     }
 }

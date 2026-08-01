@@ -124,8 +124,7 @@ namespace ii.AscendancyLib.Reader
 				Common.ReadStruct(br, typeof(StarLaneCount));
 			}
 
-			// 7672 unknown bytes
-			file.Unknown7 = br.ReadBytes(7672);
+			file.Trailer = (SavTrailer)Common.ReadStruct(br, typeof(SavTrailer));
 			return file;
 		}
     }

@@ -5,6 +5,6 @@
         Unknown = 0,
         Peace = 1,
         War = 2,
-        Alliance = 3 //?
+        Alliance = 3
     }
 }
